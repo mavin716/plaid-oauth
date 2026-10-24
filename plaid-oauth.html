@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Connecting...</title>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+</head>
+<body>
+  <p>Returning to your app...</p>
+  <script>
+    (function () {
+      var linkToken = localStorage.getItem("link_token");
+      if (!linkToken) {
+        document.body.innerHTML = "<p>No link token found. Please start the connection from your app.</p>";
+        return;
+      }
+
+      var handler = Plaid.create({
+        token: linkToken,
+        receivedRedirectUri: window.location.href,
+        onSuccess: function (public_token, metadata) {
+          // Send public_token to your backend, then redirect the user
+          // Example:
+          // fetch("https://your-api.com/exchange", {
+          //   method: "POST",
+          //   headers: { "Content-Type": "application/json" },
+          //   body: JSON.stringify({ public_token })
+          // }).then(() => {
+          //   window.location.href = "https://yourapp.com/success";
+          // });
+
+          console.log("Success", public_token);
+          document.body.innerHTML = "<p>Connection successful. You can close this page.</p>";
+        },
+        onExit: function (err, metadata) {
+          console.error("Exit", err, metadata);
+          document.body.innerHTML = "<p>Connection cancelled or failed.</p>";
+        }
+      });
+
+      handler.open();
+    })();
+  </script>
+</body>
+</html>
